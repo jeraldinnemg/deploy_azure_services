@@ -1,3 +1,4 @@
+#Un comentario.
 #Existen muchas maneras de hacer un script.
 #Todas son válidas, siempre y cuando el script o demore demasiado en correr.
 #Inicializamos los arrays
