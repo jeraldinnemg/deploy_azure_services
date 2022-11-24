@@ -30,6 +30,5 @@ Write-Output '$($rndFrase1) $rndFrase2 $rndFrase3 $rndFrase4 $rndFrase5 $rndFras
 Write-Output "`"$rndFrase1`" $rndFrase2 $rndFrase3 $rndFrase4 $rndFrase5 $rndFrase6"
 #Quoting rules 
 #https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_quoting_rules?view=powershell-7.3
-#Leaving a comment
 
 #Comentario2
