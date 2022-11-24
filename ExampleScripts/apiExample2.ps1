@@ -15,8 +15,8 @@ foreach($nombre in $lista)
     #Resultado siempre esta en .content
     #Filtramos la URL por /?name=nombre
     #Como queremos leer la propiedad gender o country, le agregamos $() a toda la llamada.
-    $gender = $(Invoke-WebRequest -Uri "$urlGenderize/?name=$nombre" | ConvertFrom-Json).gender
-    $nation = $(Invoke-WebRequest -Uri "$urlNationalize/?name=$nombre" | ConvertFrom-Json).country[0].country_id
+    $gender = $( $(Invoke-WebRequest -Uri "$urlGenderize/?name=$nombre").content | ConvertFrom-Json).gender
+    $nation = $( $(Invoke-WebRequest -Uri "$urlNationalize/?name=$nombre").content | ConvertFrom-Json).country[0].country_id
     Write-Output "Gender: $gender"
     Write-Output "Nation: $nation"
     if($nombre -match "Juan")
