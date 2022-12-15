@@ -27,6 +27,7 @@ Connect-AzAccount
       # <Cloud provider 2 chars>-<Location 3 chars>-<Environment 1 char>-<DeploymentID 6 chars>-<Resource Type 3 chars>-<Sequence 2 chars>
       # Valid name example: az-eus-d-001122-rg-01 / Invalid name example: az-eus-d-001122-vm-001
       [regex]$rx = ('^[a-zA-Z]{2}-[a-zA-Z]{3}-[a-zA-Z]{1}-[a-zA-Z0-9]{6}-[a-zA-Z0-9]{3}-[a-zA-Z0-9]{2}$')
+
     }
     
 
