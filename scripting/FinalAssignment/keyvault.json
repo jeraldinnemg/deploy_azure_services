@@ -1,0 +1,55 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "resourceGroupName": {
+        "type": "string",
+        "metadata": {
+          "description": "Nombre del grupo de recursos donde se crearán los recursos."
+        }
+      },
+      "keyVaultName": {
+        "type": "string",
+        "metadata": {
+          "description": "Nombre del key vault que se creará."
+        }
+      }
+    },
+    "variables": {
+      "location": "[resourceGroup().location]"
+    },
+    "resources": [
+      {
+        "type": "Microsoft.KeyVault/vaults",
+        "apiVersion": "2019-09-01",
+        "name": "[parameters('keyVaultName')]",
+        "location": "[variables('location')]",
+        "properties": {
+          "sku": {
+            "name": "standard"
+          },
+          "tenantId": "[subscription().tenantId]",
+          "accessPolicies": [
+            {
+              "objectId": "[reference(concat('Microsoft.ManagedIdentity/userAssignedIdentities/', parameters('keyVaultName')), '2019-08-01').principalId]",
+              "permissions": {
+                "keys": [
+                  "all"
+                ],
+                "secrets": [
+                  "all"
+                ]
+              }
+            }
+          ],
+          "enabledForDeployment": true,
+          "enabledForTemplateDeployment": true,
+          "enabledForDiskEncryption": true
+        },
+        "dependsOn": [
+          "[resourceId('Microsoft.Resources/resourceGroups/', parameters('resourceGroupName'))]"
+        ]
+      }
+    ]
+  }
+  

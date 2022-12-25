@@ -1,0 +1,36 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "resourceGroupName": {
+        "type": "string",
+        "metadata": {
+          "description": "Nombre del grupo de recursos donde se crearán los recursos."
+        }
+      },
+      "networkSecurityGroupName": {
+        "type": "string",
+        "metadata": {
+          "description": "Nombre del grupo de seguridad de red que se creará."
+        }
+      }
+    },
+    "variables": {
+      "location": "[resourceGroup().location]"
+    },
+    "resources": [
+      {
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "apiVersion": "2019-07-01",
+        "name": "[parameters('networkSecurityGroupName')]",
+        "location": "[variables('location')]",
+        "properties": {
+          "securityRules": []
+        },
+        "dependsOn": [
+          "[resourceId('Microsoft.Resources/resourceGroups/', parameters('resourceGroupName'))]"
+        ]
+      }
+    ]
+  }
+  
