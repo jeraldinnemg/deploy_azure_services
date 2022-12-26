@@ -1,0 +1,98 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+      "name": {
+          "value": "az-eus-p-123456-kva-01"
+      },
+      "location": {
+          "value": "eastus"
+      },
+      "sku": {
+          "value": "Standard"
+      },
+      "accessPolicies": {
+          "value": [
+              {
+                  "objectId": "6ed3a834-6aea-4bce-bc7e-c65394538590",
+                  "tenantId": "5b973f99-77df-4beb-b27d-aa0c70b8482c",
+                  "permissions": {
+                      "keys": [
+                          "Get",
+                          "List",
+                          "Update",
+                          "Create",
+                          "Import",
+                          "Delete",
+                          "Recover",
+                          "Backup",
+                          "Restore",
+                          "GetRotationPolicy",
+                          "SetRotationPolicy",
+                          "Rotate"
+                      ],
+                      "secrets": [
+                          "Get",
+                          "List",
+                          "Set",
+                          "Delete",
+                          "Recover",
+                          "Backup",
+                          "Restore"
+                      ],
+                      "certificates": [
+                          "Get",
+                          "List",
+                          "Update",
+                          "Create",
+                          "Import",
+                          "Delete",
+                          "Recover",
+                          "Backup",
+                          "Restore",
+                          "ManageContacts",
+                          "ManageIssuers",
+                          "GetIssuers",
+                          "ListIssuers",
+                          "SetIssuers",
+                          "DeleteIssuers"
+                      ]
+                  },
+                  "applicationId": ""
+              }
+          ]
+      },
+      "tenant": {
+          "value": "5b973f99-77df-4beb-b27d-aa0c70b8482c"
+      },
+      "enabledForDeployment": {
+          "value": false
+      },
+      "enabledForTemplateDeployment": {
+          "value": false
+      },
+      "enabledForDiskEncryption": {
+          "value": false
+      },
+      "enableRbacAuthorization": {
+          "value": false
+      },
+      "publicNetworkAccess": {
+          "value": "Enabled"
+      },
+      "enableSoftDelete": {
+          "value": true
+      },
+      "softDeleteRetentionInDays": {
+          "value": 90
+      },
+      "networkAcls": {
+          "value": {
+              "defaultAction": "allow",
+              "bypass": "AzureServices",
+              "ipRules": [],
+              "virtualNetworkRules": []
+          }
+      }
+  }
+}

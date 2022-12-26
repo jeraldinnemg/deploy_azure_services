@@ -25,8 +25,7 @@
       "defaultValue": "[resourceGroup().location]"
     },
     "appServicePlanName": {
-      "type": "string",
-      "defaultValue": "exampleplan"
+      "type": "string"
     }
   },
   "resources": [
@@ -34,6 +33,11 @@
       "type": "Microsoft.Storage/storageAccounts",
       "apiVersion": "2021-09-01",
     "name": "[parameters('storageAccountName')]",
+      "metadata": {
+        "validation": {
+          "pattern": "^[a-zA-Z]{2}-[a-zA-Z]{3}-[a-zA-Z]{1}-[0-9]{6}-[a-zA-Z]{3}-[0-9]{2}$"
+        }
+      },
       "location": "[parameters('location')]",
       "sku": {
         "name": "[parameters('storageSKU')]"

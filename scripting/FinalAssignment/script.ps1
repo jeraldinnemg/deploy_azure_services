@@ -2,10 +2,23 @@
 param(
 
     [Parameter(Mandatory)]$rgName,
-    $location = "eastus",
+    [Parameter(Mandatory)]$location,
     [Parameter(Mandatory)]$storageAccountName
 
 )
+
+# Define the resource types that can be deployed or deleted
+$resourceTypes = @(
+    "ResourceGroup",
+    "NetworkSecurityGroup",
+    "VirtualNetwork",
+    "Subnet",
+    "KeyVault",
+    "StorageAccount",
+    "AppServicePlan",
+    "AzureFunctionApp"
+)
+
 #Connect to your Azure Account
 Connect-AzAccount
 
@@ -39,6 +52,8 @@ if(!$existingRG){
         -ResourceGroupName $newRG.ResourceGroupName  `
         -TemplateFile $templateFilesa `
 
+
+
     }
     catch {
         #Throw an exception in case the name of the resource group is not valid
@@ -48,6 +63,10 @@ if(!$existingRG){
 }
 
 else{
+    $hashtableParameters = @{
+        storageAccountName = $storageAccountName
+    }
+    
     #Deploy the resourcen in the existing resource group name given
     $templateFileasp = "./appserviceplan.json"
     New-AzResourceGroupDeployment `
