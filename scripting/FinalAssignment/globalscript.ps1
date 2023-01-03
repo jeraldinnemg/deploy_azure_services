@@ -1,7 +1,7 @@
 param(
 
     [Parameter(Mandatory)]$rgName,
-    [Parameter(Mandatory)]$location
+    $location = "eastus"
 )
 
 
@@ -93,9 +93,18 @@ while ($true) {
     # If user selected "create", deploy resource using an ARM template
     if ($action -eq "create") {
       $resourceGroupName = Read-Host "Enter the name of the resource group where you want to create the resource:"
-      $templateFilePath = Read-Host "Enter the path of the ARM template file you want to use for the deployment:"
-      $templateParameterFilePath = Read-Host "Enter the path of the ARM template parameter file you want to use for the deployment:"
-      New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile $templateFilePath -TemplateParameterFile $templateParameterFilePath
+      
+      #Deploy appservice plan
+      #No usar path absoluto sino el directorio en que está usando el ususario. pwd
+      $templateFilePath = "C:\repos\scripting\FinalAssignment\appserviceplan.json" 
+
+
+      $templateParameterFilePath = "C:\repos\scripting\FinalAssignment\appserviceplanparameters.parameters.json"
+      
+      New-AzResourceGroupDeployment 
+      -ResourceGroupName $resourceGroupName 
+      -TemplateFile $templateFilePath 
+      -TemplateParameterFile $templateParameterFilePath
     }
 
     # If user selected "delete", delete the resource
@@ -111,6 +120,6 @@ while ($true) {
     Environment 1 char,
     DeploymentID 6 chars,
     Resource Type 3 chars y
-    Sequence 2 chars. Example: az-eus-d-123456-asp-01")
+    Sequence 2 chars. Example: azeusd123456asp01")
   }
 }

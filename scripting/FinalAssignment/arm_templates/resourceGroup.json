@@ -10,7 +10,7 @@
     },
     "rgLocation": {
       "type": "string",
-      "defaultValue": "[deployment().location]",
+      "defaultValue": "eastus",
       "metadata": {
         "description": "Location for the resourceGroup"
       }

@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
       "name": {
-          "value": "az-eus-p-123456-kva-01"
+          "value": "string"
       },
       "location": {
           "value": "eastus"
