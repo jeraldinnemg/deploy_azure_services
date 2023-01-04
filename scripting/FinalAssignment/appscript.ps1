@@ -8,7 +8,8 @@ param(
     [string]$kvName,
     [string]$saName,
     [string]$aspName,
-    [string]$afaName
+    [string]$afaName,
+    [string]$email
 )
 
 Connect-AzAccount
@@ -38,7 +39,7 @@ if ($action -eq 'create') {
                     Throw "Deployment of RG failed: $_"
                 }                
             }
-            else { Write-Output "The name is not available" }      
+            else { Write-Output "The name of the resource is not available" }      
         }
         else { 
             # If resource name is not valid, display error message
@@ -65,7 +66,7 @@ if ($action -eq 'create') {
                     Throw "Deployment of NSG failed: $_"
                 }                
             }
-            else { Write-Output "NSG name not available" }      
+            else { Write-Output "The name of the NSG name is not available" }      
         }
 
         else { 
@@ -93,7 +94,7 @@ if ($action -eq 'create') {
                     Throw "Deployment of ASP failed: $_"
                 }                
             }
-            else { Write-Output "ASP name not available" }      
+            else { Write-Output "The name of the ASP is not available" }      
         }
         else { 
             # If resource name is not valid, display error message
@@ -107,8 +108,7 @@ if ($action -eq 'create') {
         }
     }
 
-    if ($SAName) {
-        Write-Output "Creation of Storage Account"
+    if ($saName) {
         if (ValidateName($saName) -eq 1) {
             $existingSA = Get-AzStorageAccount -ResourceGroupName $rgName -Name $saName
             if (!$existingSA) {         
@@ -123,7 +123,7 @@ if ($action -eq 'create') {
                     Throw "Deployment of SA failed: $_"
                 }                
             }
-            else { Write-Output "SA name not available" }      
+            else { Write-Output "The name of the SA is not available" }      
         }
                 else { 
             # If resource name is not valid, display error message
@@ -142,23 +142,25 @@ if ($action -eq 'create') {
         if (ValidateName($kvName) -eq 1) {
             $existingKV = Get-AzKeyVault -ResourceGroupName $rgName -Name $kvName
             if (!$existingKV) {    
-                $tenantId=(Get-AzTenant).id     
+                $tenantId=(Get-AzTenant).id  
+                $objectID = (Get-AzADUser -UserPrincipalName $email).Id   
                 try {
                     $hashtableParameters = @{
                         keyVaultName = $kvName
                         location = $location
                         sku= "Standard"
                         tenantId= $tenantId
+                        objectId = $objectID
                     }        
                             
-                    #New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile "arm_templates\keyvault.json" -TemplateParameterObject $hashtableParameters
-                    New-AzKeyVault -ResourceGroupName $rgName -Name $kvName -Location $location 
+                    New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile "arm_templates\keyvault.json" -TemplateParameterObject $hashtableParameters
+                    #New-AzKeyVault -ResourceGroupName $rgName -Name $kvName -Location $location 
                 }
                 catch {
                     Throw "Deployment of KV failed: $_"
                 }                
             }
-            else { Write-Output "KV name not available" }      
+            else { Write-Output "The name of the KV is not available" }      
         }
                 else { 
             # If resource name is not valid, display error message
@@ -174,26 +176,22 @@ if ($action -eq 'create') {
 
 
     if ($afaName) {
-        Write-Output "Creation of Azure Function App"
         if (ValidateName($afaName) -eq 1) {
             $existingAFA = 
             Get-AzFunctionApp | Where-Object { ($_.Name -eq $afaName) -and ($_.ResourceGroupName -eq $rgName ) }
             if (!$existingAFA) {        
                 try {
-                # Variable block
-                $functionApp = "msdocs-serverless-python-function-$randomIdentifier"
-                $skuStorage = "Standard_LRS"
-                $functionsVersion = "4"
-                $pythonVersion = "3.9" #Allowed values: 3.7, 3.8, and 3.9  
 
                     #New-AzFunctionApp -Name $afaName -ResourceGroupName $rgName -Location $location -StorageAccountName $saName -Runtime PowerShell
-                    New-AzFunctionApp -Name $afaName -StorageAccountName $saName -Location $location -ResourceGroupName $rgName -OSType Linux -Runtime Python -RuntimeVersion $pythonVersion -FunctionsVersion $functionsVersion
+                    #New-AzFunctionApp -Name $afaName  -Location $location -StorageAccountName $saName -Runtime PowerShell
+                    New-AzFunctionApp -Name $afaName -ResourceGroupName $rgName -StorageAccount $saName -Runtime PowerShell -FunctionsVersion 4 -Location $location 
+                   
                 }
                 catch {
                     Throw "Deployment of AFA failed: $_"
                 }                
             }
-            else { Write-Output "AFA name not available" }      
+            else { Write-Output "The name of the AFA is not available" }      
         }
         else { 
             # If resource name is not valid, display error message
@@ -208,7 +206,6 @@ if ($action -eq 'create') {
     }
 
     if ($vnetName) {
-        Write-Output "Creation of Storage Account"
         if (ValidateName($vnetName) -eq 1) {
             $existingVNET = Get-AzVirtualNetwork | Where-Object { $_.VirtualNetworkName -eq $vnetName }
             if (!$existingVNET) {         
@@ -224,7 +221,38 @@ if ($action -eq 'create') {
                     Throw "Deployment of VNET failed: $_"
                 }                
             }
-            else { Write-Output "SA name not available" }      
+            else { Write-Output "The name of the SA name is available" }      
+        }
+                else { 
+            # If resource name is not valid, display error message
+            Write-Output("Please the name of the resource is not valid according to EY naming convention:
+            Cloud provider 2 chars,
+            Location 3 chars,
+            Environment 1 char,
+            DeploymentID 6 chars,
+            Resource Type 3 chars y
+            Sequence 2 chars. Example: azeusd123456asp01") 
+        }
+    }
+
+    if ($subnetName) {
+        if (ValidateName($subnetName) -eq 1) {
+            $existingSNET = Get-AzVirtualNetworkSubnet -VirtualNetworkName $vnet -ResourceGroupName $rgName| Where-Object { $_.SubnetName -eq $subnetName }
+            if (!$existingSNET) {         
+                try {
+                    $hashtableParameters = @{
+                        subnetName = $subnetName
+                        vnetName = $vnetName
+                        location = $location
+                    }        
+                            
+                    New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile "arm_templates\subnet.json" -TemplateParameterObject $hashtableParameters
+                }
+                catch {
+                    Throw "Deployment of VNET failed: $_"
+                }                
+            }
+            else { Write-Output "The name of the SA is not available" }      
         }
                 else { 
             # If resource name is not valid, display error message
@@ -247,7 +275,7 @@ elseif ($action -eq 'delete') {
             Remove-AzNetworkSecurityGroup -Name $nsgName -ResourceGroupName $rgName
         }
         else {
-            Write-Output "The NSG does not exist"
+            Write-Output "The name of the NSG does not exist"
         }
     }
 
@@ -257,7 +285,7 @@ elseif ($action -eq 'delete') {
             Remove-AzAppServicePlan -Name $aspName -ResourceGroupName $rgName 
         }
         else {
-            Write-Output "The ASP does not exist"
+            Write-Output "The name of the ASP does not exist"
         }
     }
 
@@ -268,7 +296,7 @@ elseif ($action -eq 'delete') {
             Remove-AzFunctionApp -Name $afaName -ResourceGroupName $rgName 
         }
         else {
-            Write-Output "The AFA does not exist"
+            Write-Output "The name of the AFA does not exist"
         }
     }
     if ($saName) {

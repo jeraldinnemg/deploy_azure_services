@@ -14,6 +14,9 @@
         "tenantId" : {
             "type":"string"
         },
+        "objectId" : {
+            "type":"string"
+        },
         "enableSoftDelete": {
             "type": "bool",
             "defaultValue": true 
@@ -34,6 +37,8 @@
                 "accessPolicies": [
                     {
                     "tenantId": "[parameters('tenantId')]",
+                    "objectId": "[parameters('objectId')]",
+
 
                     "permissions": {
                         "keys": [

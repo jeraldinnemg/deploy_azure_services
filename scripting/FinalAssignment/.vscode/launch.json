@@ -9,7 +9,7 @@
             "type": "PowerShell",
             "request": "launch",
             "script": "${file}",
-            "args": ["-action 'create' -rgName 'azeusp123456rgn02' -kvName 'azeusd123456kvl03'"]
+            "args": ["-action 'create' -rgName 'azeusp123456rgn20' -kvName 'azeusd123456kvl20' -email 'Jeraldinne.Molleda@gds.ey.com'"]
         }
     ]
 }

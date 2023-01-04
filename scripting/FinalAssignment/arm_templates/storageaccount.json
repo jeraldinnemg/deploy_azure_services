@@ -16,7 +16,7 @@
         "sku": {
             "allowedValues": ["Standard_LRS", "Standard_GRS", "Premium_LRS"],
             "type": "string",
-            "defaultValue": "Premium_LRS"
+            "defaultValue": "Standard_GRS"
         }
 
     },
@@ -29,13 +29,9 @@
             "sku": {
                 "name": "[parameters('sku')]"
             },
-            "kind": "[parameters('kind')]",
-            "properties": {
-                "accountType": "Standard_LRS",
-                "tableEndpoint": "true",
-                "queueEndpoint": "true",
-                "blobEndpoint": "true"
-            }
+            "kind": "[parameters('kind')]"
+            
         }
+        
     ]
 }
