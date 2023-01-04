@@ -29,7 +29,13 @@
             "sku": {
                 "name": "[parameters('sku')]"
             },
-            "kind": "[parameters('kind')]"
+            "kind": "[parameters('kind')]",
+            "properties": {
+                "accountType": "Standard_LRS",
+                "tableEndpoint": "true",
+                "queueEndpoint": "true",
+                "blobEndpoint": "true"
+            }
         }
     ]
 }

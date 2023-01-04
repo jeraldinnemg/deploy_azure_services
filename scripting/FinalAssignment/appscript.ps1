@@ -26,18 +26,11 @@ Function ValidateName($string) {
 }
 
 if ($action -eq 'create') {
-    Write-Output "####################"
-    Write-Output "Creation of resources"
-    Write-Output "####################"
-    
     if ($rgName) {
-        Write-Output "Creation of resource group..."
+
         if (ValidateName($rgName) -eq 1) {
             $existingRG = Get-AzResourceGroup | Where-Object { $_.ResourceGroupName -eq $rgName }
-            if (!$existingRG) {
-                Write-Output "####################"
-                Write-Output "Creating Resource Group"
-                Write-Output "####################"           
+            if (!$existingRG) {         
                 try {
                     New-AzResourceGroup -Name $rgName -Location $location
                 }
@@ -58,21 +51,15 @@ if ($action -eq 'create') {
             Sequence 2 chars. Example: azeusd123456asp01") 
         }
     }
-
+}
     if ($nsgName) {
-        Write-Output "Creation of Network Security Group"
         if (ValidateName($nsgName) -eq 1) {
-            Write-Output "The name is valid"
+
             $existingNSG = Get-AzNetworkSecurityGroup | Where-Object { ($_.Name -eq $nsgName) -and ($_.ResourceGroupName -eq $RGName ) }
             if (!$existingNSG) {
-                Write-Output "#################################"
-                Write-Output "Creating Network Security Group"
-                Write-Output "#################################"           
+        
                 try {
-                    New-AzNetworkSecurityGroup 
-                    -Name $nsgName 
-                    -ResourceGroupName $rgName 
-                    -Location $location
+                    New-AzNetworkSecurityGroup -Name $nsgName -ResourceGroupName $rgName -Location $location
                 }
                 catch {
                     Throw "Deployment of NSG failed: $_"
@@ -94,20 +81,13 @@ if ($action -eq 'create') {
     }
 
     if ($aspName) {
-        Write-Output "Creation of App Service Plan"
         if (ValidateName($aspName) -eq 1) {
-            $existingASP = Get-AzAppServicePlan | Where-Object { ($_.Name -eq $aspName) -and ($_.ResourceGroupName -eq $RGName ) }
-            if (!$existingASP) {
-                Write-Output "#############################"
-                Write-Output "Creation of App Service Plan"
-                Write-Output "#############################"           
+            $existingASP = Get-AzAppServicePlan | Where-Object { ($_.Name -eq $aspName) -and ($_.ResourceGroupName -eq $rgName ) }
+            if (!$existingASP) {   
                 try {
-                    New-AzAppServicePlan 
-                    -Name $aspName 
-                    -ResourceGroupName $rgName 
-                    -Location $location
-                    -TemplateFile "appservicePlan.json"
-                    -TemplateParameterFile "appserviceplanparameters.parameters.json"
+                    
+                    New-AzAppServicePlan -ResourceGroupName $rgName -Name $aspName -Location $location -Tier "Basic" -NumberofWorkers 2 -WorkerSize "Small"
+
                 }
                 catch {
                     Throw "Deployment of ASP failed: $_"
@@ -127,15 +107,11 @@ if ($action -eq 'create') {
         }
     }
 
-    
     if ($SAName) {
         Write-Output "Creation of Storage Account"
         if (ValidateName($saName) -eq 1) {
             $existingSA = Get-AzStorageAccount -ResourceGroupName $rgName -Name $saName
-            if (!$existingSA) {
-                Write-Output "####################"
-                Write-Output "Creation of Storage Account"
-                Write-Output "####################"           
+            if (!$existingSA) {         
                 try {
                     $hashtableParameters = @{
                         storageAccountName = $saName
@@ -161,17 +137,57 @@ if ($action -eq 'create') {
         }
     }
 
-    if ($AFAName) {
+    if ($kvName) {
+
+        if (ValidateName($kvName) -eq 1) {
+            $existingKV = Get-AzKeyVault -ResourceGroupName $rgName -Name $kvName
+            if (!$existingKV) {    
+                $tenantId=(Get-AzTenant).id     
+                try {
+                    $hashtableParameters = @{
+                        keyVaultName = $kvName
+                        location = $location
+                        sku= "Standard"
+                        tenantId= $tenantId
+                    }        
+                            
+                    #New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile "arm_templates\keyvault.json" -TemplateParameterObject $hashtableParameters
+                    New-AzKeyVault -ResourceGroupName $rgName -Name $kvName -Location $location 
+                }
+                catch {
+                    Throw "Deployment of KV failed: $_"
+                }                
+            }
+            else { Write-Output "KV name not available" }      
+        }
+                else { 
+            # If resource name is not valid, display error message
+            Write-Output("Please the name of the resource is not valid according to EY naming convention:
+            Cloud provider 2 chars,
+            Location 3 chars,
+            Environment 1 char,
+            DeploymentID 6 chars,
+            Resource Type 3 chars y
+            Sequence 2 chars. Example: azeusd123456asp01") 
+        }
+    }
+
+
+    if ($afaName) {
         Write-Output "Creation of Azure Function App"
         if (ValidateName($afaName) -eq 1) {
             $existingAFA = 
             Get-AzFunctionApp | Where-Object { ($_.Name -eq $afaName) -and ($_.ResourceGroupName -eq $rgName ) }
-            if (!$existingAFA) {
-                Write-Output "####################"
-                Write-Output "Creation of Azure Function App because the name does not exist"
-                Write-Output "####################"           
+            if (!$existingAFA) {        
                 try {
-                    New-AzFunctionApp -Name $AFAName -ResourceGroupName $RGName -Location $location -StorageAccountName $SAName -Runtime PowerShell
+                # Variable block
+                $functionApp = "msdocs-serverless-python-function-$randomIdentifier"
+                $skuStorage = "Standard_LRS"
+                $functionsVersion = "4"
+                $pythonVersion = "3.9" #Allowed values: 3.7, 3.8, and 3.9  
+
+                    #New-AzFunctionApp -Name $afaName -ResourceGroupName $rgName -Location $location -StorageAccountName $saName -Runtime PowerShell
+                    New-AzFunctionApp -Name $afaName -StorageAccountName $saName -Location $location -ResourceGroupName $rgName -OSType Linux -Runtime Python -RuntimeVersion $pythonVersion -FunctionsVersion $functionsVersion
                 }
                 catch {
                     Throw "Deployment of AFA failed: $_"
@@ -191,7 +207,37 @@ if ($action -eq 'create') {
         }
     }
 
-}
+    if ($vnetName) {
+        Write-Output "Creation of Storage Account"
+        if (ValidateName($vnetName) -eq 1) {
+            $existingVNET = Get-AzVirtualNetwork | Where-Object { $_.VirtualNetworkName -eq $vnetName }
+            if (!$existingVNET) {         
+                try {
+                    $hashtableParameters = @{
+                        virtualnetworkName = $vnetName
+                        location = $location
+                    }        
+                            
+                    New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile "arm_templates\virtualnetwork.json" -TemplateParameterObject $hashtableParameters
+                }
+                catch {
+                    Throw "Deployment of VNET failed: $_"
+                }                
+            }
+            else { Write-Output "SA name not available" }      
+        }
+                else { 
+            # If resource name is not valid, display error message
+            Write-Output("Please the name of the resource is not valid according to EY naming convention:
+            Cloud provider 2 chars,
+            Location 3 chars,
+            Environment 1 char,
+            DeploymentID 6 chars,
+            Resource Type 3 chars y
+            Sequence 2 chars. Example: azeusd123456asp01") 
+        }
+    }
+
 
 elseif ($action -eq 'delete') {
     Write-Output "Deletion of resources..."
