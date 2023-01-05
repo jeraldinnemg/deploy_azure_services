@@ -16,21 +16,22 @@ Connect-AzAccount
 
 Function ValidateName($string) {
     $validationRegex = '^[A-Za-z]{2}[A-Za-z]{3}[A-Za-z]{1}[0-9]{6}[A-Za-z]{3}[0-9]{2}$'
-    try{
+    try {
         if ($string -match $validationRegex) {
             return 1
         }
     }
-    catch{
+    catch {
         Write-LogCustom -Message "The name of the resource is not valid according to EY naming convention"
       }
 }
 
 if ($action -eq 'create') {
     if ($rgName) {
-
+        
         if (ValidateName($rgName) -eq 1) {
             $existingRG = Get-AzResourceGroup | Where-Object { $_.ResourceGroupName -eq $rgName }
+            
             if (!$existingRG) {         
                 try {
                     New-AzResourceGroup -Name $rgName -Location $location
@@ -53,42 +54,41 @@ if ($action -eq 'create') {
         }
     }
 }
-    if ($nsgName) {
-        if (ValidateName($nsgName) -eq 1) {
 
-            $existingNSG = Get-AzNetworkSecurityGroup | Where-Object { ($_.Name -eq $nsgName) -and ($_.ResourceGroupName -eq $RGName ) }
-            if (!$existingNSG) {
-        
-                try {
-                    New-AzNetworkSecurityGroup -Name $nsgName -ResourceGroupName $rgName -Location $location
-                }
-                catch {
-                    Throw "Deployment of NSG failed: $_"
-                }                
+if ($nsgName) {
+    if (ValidateName($nsgName) -eq 1) {
+
+        $existingNSG = Get-AzNetworkSecurityGroup | Where-Object { ($_.Name -eq $nsgName) -and ($_.ResourceGroupName -eq $RGName ) }
+        if (!$existingNSG) {
+    
+            try {
+                New-AzNetworkSecurityGroup -Name $nsgName -ResourceGroupName $rgName -Location $location
             }
-            else { Write-Output "The name of the NSG name is not available" }      
+            catch {
+                Throw "Deployment of NSG failed: $_"
+            }                
         }
-
-        else { 
-            # If resource name is not valid, display error message
-            Write-Output("Please the name of the resource is not valid according to EY naming convention:
-            Cloud provider 2 chars,
-            Location 3 chars,
-            Environment 1 char,
-            DeploymentID 6 chars,
-            Resource Type 3 chars y
-            Sequence 2 chars. Example: azeusd123456asp01") 
-        }
+        else { Write-Output "The name of the NSG name is not available" }      
     }
+
+    else { 
+        # If resource name is not valid, display error message
+        Write-Output("Please the name of the resource is not valid according to EY naming convention:
+        Cloud provider 2 chars,
+        Location 3 chars,
+        Environment 1 char,
+        DeploymentID 6 chars,
+        Resource Type 3 chars y
+        Sequence 2 chars. Example: azeusd123456asp01") 
+    }
+}
 
     if ($aspName) {
         if (ValidateName($aspName) -eq 1) {
             $existingASP = Get-AzAppServicePlan | Where-Object { ($_.Name -eq $aspName) -and ($_.ResourceGroupName -eq $rgName ) }
             if (!$existingASP) {   
                 try {
-                    
                     New-AzAppServicePlan -ResourceGroupName $rgName -Name $aspName -Location $location -Tier "Basic" -NumberofWorkers 2 -WorkerSize "Small"
-
                 }
                 catch {
                     Throw "Deployment of ASP failed: $_"
@@ -181,12 +181,8 @@ if ($action -eq 'create') {
             Get-AzFunctionApp | Where-Object { ($_.Name -eq $afaName) -and ($_.ResourceGroupName -eq $rgName ) }
             if (!$existingAFA) {        
                 try {
-
-                    #New-AzFunctionApp -Name $afaName -ResourceGroupName $rgName -Location $location -StorageAccountName $saName -Runtime PowerShell
-                    #New-AzFunctionApp -Name $afaName  -Location $location -StorageAccountName $saName -Runtime PowerShell
                     New-AzFunctionApp -Name $afaName -ResourceGroupName $rgName -StorageAccount $saName -Runtime PowerShell -FunctionsVersion 4 -Location $location 
-                   
-                }
+                   }
                 catch {
                     Throw "Deployment of AFA failed: $_"
                 }                
@@ -213,8 +209,7 @@ if ($action -eq 'create') {
                     $hashtableParameters = @{
                         virtualnetworkName = $vnetName
                         location = $location
-                    }        
-                            
+                    }             
                     New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile "arm_templates\virtualnetwork.json" -TemplateParameterObject $hashtableParameters
                 }
                 catch {
@@ -223,7 +218,7 @@ if ($action -eq 'create') {
             }
             else { Write-Output "The name of the SA name is available" }      
         }
-                else { 
+        else { 
             # If resource name is not valid, display error message
             Write-Output("Please the name of the resource is not valid according to EY naming convention:
             Cloud provider 2 chars,
@@ -237,24 +232,27 @@ if ($action -eq 'create') {
 
     if ($subnetName) {
         if (ValidateName($subnetName) -eq 1) {
-            $existingSNET = Get-AzVirtualNetworkSubnet -VirtualNetworkName $vnet -ResourceGroupName $rgName| Where-Object { $_.SubnetName -eq $subnetName }
-            if (!$existingSNET) {         
-                try {
-                    $hashtableParameters = @{
-                        subnetName = $subnetName
-                        vnetName = $vnetName
-                        location = $location
-                    }        
-                            
-                    New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile "arm_templates\subnet.json" -TemplateParameterObject $hashtableParameters
-                }
-                catch {
-                    Throw "Deployment of VNET failed: $_"
-                }                
+            $rg = Get-AzResourceGroup -Name $rgName
+            $vnet = Get-AzVirtualNetwork -Name $vnetName -ResourceGroupName $rgName
+            $existingSubnet = Get-AzVirtualNetworkSubnetConfig -VirtualNetwork $vnet | Where-Object { $_.Name -eq $SubnetName }
+            
+            if (!$existingSubnet) {
+            try {
+                $hashtableParameters = @{
+                    virtualnetworkName = $vnetName
+                    subnetName= $subnetName
+                    location = $location
+                }            
+                New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile "arm_templates\subnet.json" -TemplateParameterObject $hashtableParameters
             }
-            else { Write-Output "The name of the SA is not available" }      
-        }
-                else { 
+            catch {
+                Throw "Deployment of VNET failed: $_"
+            }                
+            }
+            else { 
+                Write-Output "The name of the Snet is not available" }  
+            }    
+            else { 
             # If resource name is not valid, display error message
             Write-Output("Please the name of the resource is not valid according to EY naming convention:
             Cloud provider 2 chars,
@@ -265,8 +263,7 @@ if ($action -eq 'create') {
             Sequence 2 chars. Example: azeusd123456asp01") 
         }
     }
-
-
+    
 elseif ($action -eq 'delete') {
     Write-Output "Deletion of resources..."
     if ($NSGName) {
