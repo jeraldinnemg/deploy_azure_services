@@ -83,7 +83,7 @@ if ($nsgName) {
     }
 }
 
-    if ($aspName) {
+if ($aspName) {
         if (ValidateName($aspName) -eq 1) {
             $existingASP = Get-AzAppServicePlan | Where-Object { ($_.Name -eq $aspName) -and ($_.ResourceGroupName -eq $rgName ) }
             if (!$existingASP) {   
@@ -106,9 +106,9 @@ if ($nsgName) {
             Resource Type 3 chars y
             Sequence 2 chars. Example: azeusd123456asp01") 
         }
-    }
+}
 
-    if ($saName) {
+if ($saName) {
         if (ValidateName($saName) -eq 1) {
             $existingSA = Get-AzStorageAccount -ResourceGroupName $rgName -Name $saName
             if (!$existingSA) {         
@@ -135,9 +135,9 @@ if ($nsgName) {
             Resource Type 3 chars y
             Sequence 2 chars. Example: azeusd123456asp01") 
         }
-    }
+}
 
-    if ($kvName) {
+if ($kvName) {
 
         if (ValidateName($kvName) -eq 1) {
             $existingKV = Get-AzKeyVault -ResourceGroupName $rgName -Name $kvName
@@ -172,10 +172,10 @@ if ($nsgName) {
             Resource Type 3 chars y
             Sequence 2 chars. Example: azeusd123456asp01") 
         }
-    }
+}
 
 
-    if ($afaName) {
+if ($afaName) {
         if (ValidateName($afaName) -eq 1) {
             $existingAFA = 
             Get-AzFunctionApp | Where-Object { ($_.Name -eq $afaName) -and ($_.ResourceGroupName -eq $rgName ) }
@@ -201,7 +201,7 @@ if ($nsgName) {
         }
     }
 
-    if ($vnetName) {
+if ($vnetName) {
         if (ValidateName($vnetName) -eq 1) {
             $existingVNET = Get-AzVirtualNetwork | Where-Object { $_.VirtualNetworkName -eq $vnetName }
             if (!$existingVNET) {         
@@ -230,7 +230,7 @@ if ($nsgName) {
         }
     }
 
-    if ($subnetName) {
+if ($subnetName) {
         if (ValidateName($subnetName) -eq 1) {
             $rg = Get-AzResourceGroup -Name $rgName
             $vnet = Get-AzVirtualNetwork -Name $vnetName -ResourceGroupName $rgName
