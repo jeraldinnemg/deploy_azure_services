@@ -1,0 +1,10 @@
+/subscriptions/879ae069-bdf6-4505-85b0-219d938a8af3/resourceGroups/azeusd123456rsg10/providers/Microsoft.Network/virtualNetworks/azeusp123456vnt10
+/subscriptions/879ae069-bdf6-4505-85b0-219d938a8af3/resourceGroups/azeusd123456rsg51/providers/Microsoft.Storage/storageAccounts/azeusp123456san51
+/subscriptions/879ae069-bdf6-4505-85b0-219d938a8af3/resourceGroups/azeusd123456rsg60/providers/Microsoft.Storage/storageAccounts/azeusp123456san60
+/subscriptions/879ae069-bdf6-4505-85b0-219d938a8af3/resourceGroups/azeusd123456rsg61/providers/Microsoft.Storage/storageAccounts/azeusp123456san61
+/subscriptions/879ae069-bdf6-4505-85b0-219d938a8af3/resourceGroups/azeusd123456rsg61/providers/Microsoft.Web/sites/azeusd123456afa61
+/subscriptions/879ae069-bdf6-4505-85b0-219d938a8af3/resourceGroups/azeusd123456rsg61/providers/Microsoft.Web/serverFarms/EastUSPlan
+/subscriptions/879ae069-bdf6-4505-85b0-219d938a8af3/resourceGroups/azeusd123456rsg22/providers/Microsoft.Network/networkSecurityGroups/azeusd123456nsg22
+/subscriptions/879ae069-bdf6-4505-85b0-219d938a8af3/resourceGroups/azeusd123456rsg90/providers/Microsoft.Network/networkSecurityGroups/azeusd123456nsg90
+/subscriptions/879ae069-bdf6-4505-85b0-219d938a8af3/resourceGroups/azeusp123456rgn08/providers/Microsoft.KeyVault/vaults/azeusd123456kvl08
+/subscriptions/879ae069-bdf6-4505-85b0-219d938a8af3/resourceGroups/azeusp123456rgn09/providers/Microsoft.KeyVault/vaults/azeusd123456kvl09

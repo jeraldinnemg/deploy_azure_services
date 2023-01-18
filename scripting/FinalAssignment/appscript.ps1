@@ -1,3 +1,4 @@
+
 param(
     [Parameter(Mandatory)]$action,
     $location = "eastus",
@@ -62,13 +63,15 @@ if ($nsgName) {
         if (!$existingNSG) {
     
             try {
-                New-AzNetworkSecurityGroup -Name $nsgName -ResourceGroupName $rgName -Location $location
+                $hashtableParameters = @{
+                    networkSecurityGroupName = $nsgName
+                }        
+                        
+                New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile "arm_templates\networksecuritygroup.json" -TemplateParameterObject $hashtableParameters
             }
             catch {
-                Throw "Deployment of NSG failed: $_"
-            }                
-        }
-        else { Write-Output "The name of the NSG name is not available" }      
+                Throw "Deployment of SA failed: $_"
+            }        
     }
 
     else { 
@@ -82,6 +85,8 @@ if ($nsgName) {
         Sequence 2 chars. Example: azeusd123456asp01") 
     }
 }
+}
+
 
 if ($aspName) {
         if (ValidateName($aspName) -eq 1) {
@@ -114,10 +119,10 @@ if ($saName) {
             if (!$existingSA) {         
                 try {
                     $hashtableParameters = @{
-                        storageAccountName = $saName
+                        storageAccountName = $StorageAccountName
                     }        
                             
-                    New-AzResourceGroupDeployment -ResourceGroupName $rgName -TemplateFile "arm_templates\storageaccount.json" -TemplateParameterObject $hashtableParameters
+                    New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroupName -TemplateFile "arm_templates\storageaccount.json" -TemplateParameterObject $hashtableParameters
                 }
                 catch {
                     Throw "Deployment of SA failed: $_"
@@ -317,3 +322,28 @@ elseif ($action -eq 'delete') {
     }
     
 }
+
+function Show-ExportResourceIds {
+    # Obtener una lista de todos los recursos de Azure
+    $resources = Get-AzResource
+  
+    # Crear una lista para almacenar los recursos ID generados o borrados
+    $resourceIds = @()
+  
+    # Añadir los recursos ID a la lista
+    foreach ($resource in $resources) {
+      $resourceIds += $resource.ResourceId
+    }
+  
+    # Mostrar los recursos ID
+    $resourceIds
+  
+    # Exportar los recursos ID a un archivo de texto
+    $resourceIds | Out-File -FilePath 'resource_ids.txt'
+  }
+  
+  # Ejecutar la función
+  Show-ExportResourceIds
+  
+
+  
